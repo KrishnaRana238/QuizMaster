@@ -1,0 +1,1008 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Quizmaster{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-card {
+        transition: all 0.3s ease;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(30px, -30px);
+    }
+
+    .stat-card .card-body {
+        position: relative;
+        z-index: 2;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        opacity: 0.8;
+    }
+
+    .progress-card {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+    }
+
+    .progress-ring {
+        width: 120px;
+        height: 120px;
+        position: relative;
+        margin: 0 auto;
+    }
+
+    .progress-ring svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+    }
+
+    .progress-ring circle {
+        fill: none;
+        stroke-width: 8;
+        stroke-linecap: round;
+    }
+
+    .progress-ring .background {
+        stroke: rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-ring .progress {
+        stroke: white;
+        stroke-dasharray: 0 377;
+        transition: stroke-dasharray 0.5s ease;
+    }
+
+    .progress-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .achievement-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        margin: 0.25rem;
+        background: linear-gradient(135deg, #ffd700, #ffed4e);
+        color: #333;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .achievement-badge:hover {
+        transform: scale(1.05);
+        color: #333;
+    }
+
+    .activity-item {
+        padding: 1rem;
+        border-left: 4px solid var(--primary-color);
+        margin-bottom: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .activity-item:hover {
+        background: #e9ecef;
+        transform: translateX(5px);
+    }
+
+    .activity-time {
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        margin: 0 auto 1rem;
+    }
+
+    .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .quick-stats {
+            grid-template-columns: 1fr;
+        }
+        
+        .progress-ring {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-2 text-center">
+                            <div class="user-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <h2 class="mb-1">Welcome back, {{ user.username }}!</h2>
+                            <p class="text-muted mb-0">
+                                {% if is_admin %}
+                                    You have admin privileges. You can create and manage quizzes.
+                                {% else %}
+                                    Ready to challenge your knowledge? Let's start learning!
+                                {% endif %}
+                            </p>
+                            <small class="text-muted">Last login: {{ user.last_login|date:"M d, Y H:i" }}</small>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <div class="badge bg-{% if is_admin %}success{% else %}primary{% endif %} fs-6 mb-2">
+                                {% if is_admin %}Administrator{% else %}Learner{% endif %}
+                            </div>
+                            <div class="achievement-badge">
+                                <i class="fas fa-trophy"></i> Active Member
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Section -->
+    <div class="quick-stats">
+        <div class="card dashboard-card stat-card">
+            <div class="card-body text-center">
+                <div class="row align-items-center">
+                    <div class="col-8">
+                        <div class="stat-number">{{ total_quizzes|default:0 }}</div>
+                        <div class="stat-label">
+                            {% if is_admin %}Quizzes Created{% else %}Quizzes Taken{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <i class="fas fa-list stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card dashboard-card stat-card">
+            <div class="card-body text-center">
+                <div class="row align-items-center">
+                    <div class="col-8">
+                        <div class="stat-number">{{ total_submissions|default:0 }}</div>
+                        <div class="stat-label">
+                            {% if is_admin %}Total Submissions{% else %}Quiz Attempts{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <i class="fas fa-paper-plane stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card dashboard-card stat-card">
+            <div class="card-body text-center">
+                <div class="row align-items-center">
+                    <div class="col-8">
+                        <div class="stat-number">{{ average_score|default:0|floatformat:1 }}%</div>
+                        <div class="stat-label">Average Score</div>
+                    </div>
+                    <div class="col-4">
+                        <i class="fas fa-chart-line stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card dashboard-card stat-card">
+            <div class="card-body text-center">
+                <div class="row align-items-center">
+                    <div class="col-8">
+                        <div class="stat-number">{{ user_rank|default:"-" }}</div>
+                        <div class="stat-label">Global Rank</div>
+                    </div>
+                    <div class="col-4">
+                        <i class="fas fa-trophy stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Overview -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card dashboard-card progress-card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Learning Progress</h5>
+                    <div class="progress-ring">
+                        <svg>
+                            <circle class="background" cx="60" cy="60" r="54"></circle>
+                            <circle class="progress" cx="60" cy="60" r="54" 
+                                    style="stroke-dasharray: {{ progress_percentage|default:0 }} 377;"></circle>
+                        </svg>
+                        <div class="progress-text">{{ progress_percentage|default:0|floatformat:0 }}%</div>
+                    </div>
+                    <p class="mt-3">Overall completion rate across all quizzes</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar"></i> Performance Chart</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-clock"></i> Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_submissions %}
+                        {% for submission in recent_submissions %}
+                            <div class="activity-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong>{{ submission.quiz.title }}</strong>
+                                        <p class="mb-1">Score: {{ submission.score }}%</p>
+                                        <small class="activity-time">
+                                            {{ submission.submitted_at|timesince }} ago
+                                        </small>
+                                    </div>
+                                    <div class="text-end">
+                                        {% if submission.score >= 80 %}
+                                            <i class="fas fa-medal text-warning"></i>
+                                        {% elif submission.score >= 60 %}
+                                            <i class="fas fa-thumbs-up text-success"></i>
+                                        {% else %}
+                                            <i class="fas fa-redo text-info"></i>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No recent activity. Start taking quizzes to see your progress!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-trophy"></i> Achievements</h5>
+                </div>
+                <div class="card-body">
+                    <div class="achievement-badge">
+                        <i class="fas fa-star"></i> First Quiz
+                    </div>
+                    <div class="achievement-badge">
+                        <i class="fas fa-fire"></i> 5 Quiz Streak
+                    </div>
+                    <div class="achievement-badge">
+                        <i class="fas fa-medal"></i> High Scorer
+                    </div>
+                    <div class="achievement-badge">
+                        <i class="fas fa-graduation-cap"></i> Quiz Master
+                    </div>
+                    <div class="achievement-badge">
+                        <i class="fas fa-clock"></i> Speed Runner
+                    </div>
+                    <div class="achievement-badge">
+                        <i class="fas fa-bullseye"></i> Perfect Score
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Section -->
+    {% if is_admin %}
+        <!-- Admin Dashboard Content -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card dashboard-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-list"></i> My Quizzes</h5>
+                        <a href="{% url 'create_quiz' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Create New Quiz
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if quizzes %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Questions</th>
+                                            <th>Submissions</th>
+                                            <th>Avg Score</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for quiz in quizzes %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ quiz.title }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ quiz.description|truncatewords:10 }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{ quiz.questions.count }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">{{ quiz.submissions.count }}</span>
+                                            </td>
+                                            <td>
+                                                {% if quiz.submissions.count > 0 %}
+                                                    {{ quiz.submissions.all|length }}%
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="{% url 'add_questions' quiz.id %}" 
+                                                       class="btn btn-outline-primary" title="Add Questions">
+                                                        <i class="fas fa-plus"></i>
+                                                    </a>
+                                                    <a href="{% url 'admin_quiz_results' quiz.id %}" 
+                                                       class="btn btn-outline-info" title="View Results">
+                                                        <i class="fas fa-chart-bar"></i>
+                                                    </a>
+                                                    <a href="{% url 'delete_quiz' quiz.id %}" 
+                                                       class="btn btn-outline-danger" title="Delete Quiz"
+                                                       onclick="return confirm('Are you sure you want to delete this quiz?')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-plus-circle fa-3x text-muted mb-3"></i>
+                                <h4>No quizzes yet</h4>
+                                <p class="text-muted">Create your first quiz to get started!</p>
+                                <a href="{% url 'create_quiz' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Create Your First Quiz
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-users"></i> Recent Submissions</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if recent_submissions %}
+                            {% for submission in recent_submissions %}
+                                <div class="activity-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong>{{ submission.user.username }}</strong>
+                                            <p class="mb-1">{{ submission.quiz.title }}</p>
+                                            <small class="activity-time">
+                                                Score: {{ submission.score }}% • {{ submission.submitted_at|timesince }} ago
+                                            </small>
+                                        </div>
+                                        <div class="text-end">
+                                            <a href="{% url 'admin_quiz_results' submission.quiz.id %}" 
+                                               class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted">No submissions yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- User Dashboard Content -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card dashboard-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-list"></i> Available Quizzes</h5>
+                        <a href="{% url 'quiz_list' %}" class="btn btn-primary">
+                            <i class="fas fa-eye"></i> View All Quizzes
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if available_quizzes %}
+                            <div class="row">
+                                {% for quiz in available_quizzes %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <h6 class="card-title">{{ quiz.title }}</h6>
+                                                <p class="card-text">{{ quiz.description|truncatewords:15 }}</p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-clock"></i> {{ quiz.time_limit }} min
+                                                        </small>
+                                                    </div>
+                                                    <div>
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-question"></i> {{ quiz.questions.count }} questions
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer">
+                                                <a href="{% url 'take_quiz' quiz.id %}" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-play"></i> Take Quiz
+                                                </a>
+                                                {% if quiz.max_attempts > 1 %}
+                                                    <small class="text-muted ms-2">
+                                                        Max attempts: {{ quiz.max_attempts }}
+                                                    </small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                <h4>No quizzes available</h4>
+                                <p class="text-muted">Check back later for new quizzes!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card dashboard-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-star"></i> Top Performers</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if top_performers %}
+                            {% for performer in top_performers %}
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <strong>{{ performer.user.username }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ performer.avg_score|floatformat:1 }}% avg</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-warning">
+                                            {% if forloop.counter == 1 %}
+                                                <i class="fas fa-crown"></i> #1
+                                            {% elif forloop.counter == 2 %}
+                                                <i class="fas fa-medal"></i> #2
+                                            {% elif forloop.counter == 3 %}
+                                                <i class="fas fa-award"></i> #3
+                                            {% else %}
+                                                #{{ forloop.counter }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted">No rankings available yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if is_admin %}
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-clipboard-list"></i> Your Quizzes</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if quizzes %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Quiz Title</th>
+                                            <th>Questions</th>
+                                            <th>Submissions</th>
+                                            <th>Created</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for quiz in quizzes %}
+                                        <tr>
+                                            <td>{{ quiz.title }}</td>
+                                            <td>{{ quiz.total_questions }}</td>
+                                            <td>{{ quiz.submission_count }}</td>
+                                            <td>{{ quiz.created_at|date:"M d, Y" }}</td>
+                                            <td>
+                                                <a href="{% url 'admin_quiz_results' quiz.id %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-chart-bar"></i> Results
+                                                </a>
+                                                <a href="{% url 'add_questions' quiz.id %}" class="btn btn-sm btn-outline-success">
+                                                    <i class="fas fa-plus"></i> Add Questions
+                                                </a>
+                                                <a href="{% url 'delete_quiz' quiz.id %}" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">No quizzes created yet.</p>
+                                <a href="{% url 'create_quiz' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Create Your First Quiz
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'create_quiz' %}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Create New Quiz
+                            </a>
+                            <a href="{% url 'leaderboard' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-trophy"></i> View Leaderboard
+                            </a>
+                            <a href="{% url 'quiz_list' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-list"></i> Browse All Quizzes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- User Dashboard -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ total_quizzes_taken }}</h4>
+                                <p class="mb-0">Quizzes Taken</p>
+                            </div>
+                            <div>
+                                <i class="fas fa-clipboard-check fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ average_score|floatformat:1 }}</h4>
+                                <p class="mb-0">Average Score</p>
+                            </div>
+                            <div>
+                                <i class="fas fa-star fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ available_quizzes|length }}</h4>
+                                <p class="mb-0">Available Quizzes</p>
+                            </div>
+                            <div>
+                                <i class="fas fa-list fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4>{{ user.username }}</h4>
+                                <p class="mb-0">Welcome Back!</p>
+                            </div>
+                            <div>
+                                <i class="fas fa-user fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-history"></i> Quiz History</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if submissions %}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Quiz Title</th>
+                                            <th>Score</th>
+                                            <th>Percentage</th>
+                                            <th>Date Taken</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for submission in submissions %}
+                                        <tr>
+                                            <td>{{ submission.quiz.title }}</td>
+                                            <td>{{ submission.score }}/{{ submission.total_points }}</td>
+                                            <td>
+                                                <span class="badge bg-{% if submission.percentage_score >= 80 %}success{% elif submission.percentage_score >= 60 %}warning{% else %}danger{% endif %}">
+                                                    {{ submission.percentage_score }}%
+                                                </span>
+                                            </td>
+                                            <td>{{ submission.submitted_at|date:"M d, Y" }}</td>
+                                            <td>
+                                                <a href="{% url 'quiz_results' submission.id %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i> View Results
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">No quizzes taken yet.</p>
+                                <a href="{% url 'quiz_list' %}" class="btn btn-primary">
+                                    <i class="fas fa-play"></i> Take Your First Quiz
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-rocket"></i> Available Quizzes</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if available_quizzes %}
+                            {% for quiz in available_quizzes|slice:":5" %}
+                            <div class="card mb-2">
+                                <div class="card-body p-3">
+                                    <h6 class="card-title mb-1">{{ quiz.title }}</h6>
+                                    <p class="card-text small text-muted">{{ quiz.description|truncatewords:10 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">{{ quiz.total_questions }} questions</small>
+                                        <a href="{% url 'take_quiz' quiz.id %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-play"></i> Take Quiz
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% if available_quizzes|length > 5 %}
+                            <div class="text-center">
+                                <a href="{% url 'quiz_list' %}" class="btn btn-outline-primary btn-sm">
+                                    View All Quizzes
+                                </a>
+                            </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-search fa-2x text-muted mb-3"></i>
+                                <p class="text-muted">No available quizzes.</p>
+                                <a href="{% url 'quiz_list' %}" class="btn btn-primary btn-sm">
+                                    Browse Quizzes
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate progress ring
+        const progressRing = document.querySelector('.progress-ring .progress');
+        if (progressRing) {
+            const progress = {{ progress_percentage|default:0 }};
+            const circumference = 2 * Math.PI * 54;
+            const offset = circumference - (progress / 100) * circumference;
+            
+            setTimeout(() => {
+                progressRing.style.strokeDasharray = `${circumference - offset} ${circumference}`;
+            }, 500);
+        }
+
+        // Animate stat numbers
+        const statNumbers = document.querySelectorAll('.stat-number');
+        statNumbers.forEach(stat => {
+            const finalValue = parseInt(stat.textContent.replace(/[^\d]/g, ''));
+            if (!isNaN(finalValue)) {
+                let currentValue = 0;
+                const increment = finalValue / 50;
+                const timer = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= finalValue) {
+                        currentValue = finalValue;
+                        clearInterval(timer);
+                    }
+                    const displayValue = Math.floor(currentValue);
+                    if (stat.textContent.includes('%')) {
+                        stat.textContent = displayValue + '%';
+                    } else {
+                        stat.textContent = displayValue;
+                    }
+                }, 30);
+            }
+        });
+
+        // Performance Chart
+        const ctx = document.getElementById('performanceChart');
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Average Score',
+                        data: [65, 78, 82, 89, 95, 88],
+                        borderColor: 'rgb(102, 126, 234)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Add hover effects to cards
+        const cards = document.querySelectorAll('.dashboard-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Activity timeline animation
+        const activityItems = document.querySelectorAll('.activity-item');
+        activityItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-20px)';
+            
+            setTimeout(() => {
+                item.style.transition = 'all 0.5s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'translateX(0)';
+            }, index * 100);
+        });
+
+        // Achievement badge animations
+        const badges = document.querySelectorAll('.achievement-badge');
+        badges.forEach((badge, index) => {
+            badge.style.opacity = '0';
+            badge.style.transform = 'scale(0.8)';
+            
+            setTimeout(() => {
+                badge.style.transition = 'all 0.3s ease';
+                badge.style.opacity = '1';
+                badge.style.transform = 'scale(1)';
+            }, index * 50);
+        });
+
+        // Real-time updates (simulated)
+        setInterval(() => {
+            const badges = document.querySelectorAll('.badge');
+            badges.forEach(badge => {
+                badge.style.animation = 'pulse 0.5s ease';
+            });
+        }, 30000);
+
+        // Tooltip for achievements
+        badges.forEach(badge => {
+            badge.addEventListener('mouseenter', function() {
+                // Create tooltip
+                const tooltip = document.createElement('div');
+                tooltip.className = 'achievement-tooltip';
+                tooltip.textContent = 'Achievement unlocked!';
+                tooltip.style.position = 'absolute';
+                tooltip.style.backgroundColor = '#333';
+                tooltip.style.color = 'white';
+                tooltip.style.padding = '5px 10px';
+                tooltip.style.borderRadius = '5px';
+                tooltip.style.fontSize = '12px';
+                tooltip.style.zIndex = '1000';
+                tooltip.style.whiteSpace = 'nowrap';
+                
+                document.body.appendChild(tooltip);
+                
+                const rect = this.getBoundingClientRect();
+                tooltip.style.left = rect.left + 'px';
+                tooltip.style.top = (rect.top - 30) + 'px';
+            });
+            
+            badge.addEventListener('mouseleave', function() {
+                const tooltip = document.querySelector('.achievement-tooltip');
+                if (tooltip) {
+                    tooltip.remove();
+                }
+            });
+        });
+    });
+
+    // Add CSS animation for pulse effect
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

@@ -1,0 +1,1887 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome to Quizmaster - The Ultimate Quiz Platform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/landing.css' %}">
+<style>
+    /* Modern Midnight Purple Theme */
+    :root {
+        --primary-color: #6C5CE7;
+        --secondary-color: #A29BFE;
+        --accent-color: #FD79A8;
+        --dark-color: #2D3436;
+        --light-color: #F8F9FA;
+        --success-color: #00B894;
+        --warning-color: #FDCB6E;
+        --text-light: #636E72;
+    }
+
+    .hero-section {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
+        position: relative;
+        overflow: hidden;
+        padding: 8rem 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M30 30c0-16.569 13.431-30 30-30v30H30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        opacity: 0.1;
+    }
+
+    /* Floating Animation Elements */
+    .floating-shapes {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .shape {
+        position: absolute;
+        opacity: 0.6;
+        animation: float 20s infinite linear;
+    }
+
+    .shape:nth-child(1) {
+        top: 10%;
+        left: 10%;
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation-delay: 0s;
+    }
+
+    .shape:nth-child(2) {
+        top: 70%;
+        right: 10%;
+        width: 120px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        animation-delay: 5s;
+    }
+
+    .shape:nth-child(3) {
+        bottom: 30%;
+        left: 20%;
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        animation-delay: 10s;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+            transform: translateY(-20px) rotate(180deg);
+        }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        color: white;
+        text-align: center;
+        padding: 2rem 0;
+    }
+
+    .hero-logo {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 2rem;
+        background: linear-gradient(45deg, var(--warning-color), var(--success-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        animation: logoSpin 10s linear infinite;
+    }
+
+    @keyframes logoSpin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .hero-content h1 {
+        font-size: 4rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        animation: slideInUp 1s ease-out;
+    }
+
+    .hero-content .highlight {
+        background: linear-gradient(45deg, #FFD700, #FFA500);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+        from { text-shadow: 0 0 10px rgba(255, 215, 0, 0.8); }
+        to { text-shadow: 0 0 20px rgba(255, 165, 0, 0.8); }
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .hero-content .lead {
+        font-size: 1.4rem;
+        margin-bottom: 2.5rem;
+        font-weight: 400;
+        opacity: 0.9;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        animation: slideInUp 1s ease-out 0.3s both;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: slideInUp 1s ease-out 0.6s both;
+    }
+
+    .btn-hero {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-hero:hover::before {
+        left: 100%;
+    }
+
+    .btn-hero-primary {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-hero-primary:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+
+    .btn-hero-outline {
+        background: transparent;
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-hero-outline:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+
+    /* Interactive Quiz Cards */
+    .hero-animation {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 500px;
+        margin-top: 2rem;
+        padding: 2rem 0;
+    }
+
+    .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 2rem;
+    }
+
+    .floating-quiz {
+        position: relative;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 
+            0 12px 40px rgba(108, 92, 231, 0.15),
+            0 4px 12px rgba(0, 0, 0, 0.1);
+        max-width: 380px;
+        width: 100%;
+        animation: floatQuiz 8s ease-in-out infinite;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        transform-style: preserve-3d;
+    }
+
+    .floating-quiz:hover {
+        transform: translateY(-12px) scale(1.03);
+        box-shadow: 
+            0 20px 60px rgba(108, 92, 231, 0.25),
+            0 8px 20px rgba(0, 0, 0, 0.15);
+        background: rgba(0, 0, 0, 0.8);
+    }
+
+    .floating-quiz::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(145deg, 
+            rgba(108, 92, 231, 0.03) 0%, 
+            rgba(162, 155, 254, 0.03) 50%,
+            rgba(253, 121, 168, 0.03) 100%);
+        border-radius: 20px;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .floating-quiz:hover::before {
+        opacity: 1;
+    }
+
+    .floating-quiz::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+        border-radius: 22px;
+        z-index: -2;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .floating-quiz:hover::after {
+        opacity: 0.3;
+    }
+
+    .floating-quiz:nth-child(1) {
+        position: relative;
+        top: 0;
+        left: 0;
+        animation-delay: 0s;
+        z-index: 2;
+        margin-right: 2rem;
+    }
+
+    .floating-quiz:nth-child(2) {
+        position: relative;
+        top: 0;
+        right: 0;
+        animation-delay: 2s;
+        z-index: 3;
+        margin-left: 2rem;
+    }
+
+    .floating-quiz:nth-child(3) {
+        display: none;
+    }
+
+    @keyframes floatQuiz {
+        0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+            transform: translateY(-10px) rotate(1deg);
+        }
+    }
+
+    .quiz-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .quiz-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .quiz-description {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .quiz-stats {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.8rem;
+        color: var(--text-light);
+    }
+
+    .quiz-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    /* Animated Statistics Counter */
+    .stats-counter {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    /* Particle Animation */
+    .particles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 50%;
+        animation: particleMove 15s infinite linear;
+    }
+
+    .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 20%; animation-delay: 2s; }
+    .particle:nth-child(3) { left: 30%; animation-delay: 4s; }
+    .particle:nth-child(4) { left: 40%; animation-delay: 6s; }
+    .particle:nth-child(5) { left: 50%; animation-delay: 8s; }
+    .particle:nth-child(6) { left: 60%; animation-delay: 10s; }
+    .particle:nth-child(7) { left: 70%; animation-delay: 12s; }
+    .particle:nth-child(8) { left: 80%; animation-delay: 14s; }
+
+    @keyframes particleMove {
+        0% {
+            opacity: 0;
+            transform: translateY(100vh) rotate(0deg);
+        }
+        10% {
+            opacity: 1;
+        }
+        90% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+            transform: translateY(-100vh) rotate(360deg);
+        }
+    }
+        background-clip: text;
+    }
+
+    .hero-content .lead {
+        font-size: 1.4rem;
+        margin-bottom: 2.5rem;
+        font-weight: 400;
+        opacity: 0.9;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-hero {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-hero-primary {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-hero-primary:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+
+    .btn-hero-outline {
+        background: transparent;
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-hero-outline:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+
+    .hero-animation {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 400px;
+    }
+
+    .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    .floating-quiz {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        max-width: 350px;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .floating-quiz:nth-child(1) {
+        top: 10%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .floating-quiz:nth-child(2) {
+        top: 60%;
+        right: 10%;
+        animation-delay: 2s;
+    }
+
+    .floating-quiz:nth-child(3) {
+        bottom: 10%;
+        left: 30%;
+        animation-delay: 4s;
+    }
+
+    .quiz-card {
+        text-align: left;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .quiz-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+        animation: progressFlow 6s ease-in-out infinite;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .quiz-card::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(108, 92, 231, 0.1) 0%, transparent 70%);
+        transform: translate(-50%, -50%);
+        animation: cardGlow 4s ease-in-out infinite;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    @keyframes cardGlow {
+        0%, 100% { 
+            opacity: 0.3;
+            transform: translate(-50%, -50%) scale(0.8);
+        }
+        50% { 
+            opacity: 0.6;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+    }
+
+    @keyframes progressFlow {
+        0% { transform: translateX(-100%); }
+        50% { transform: translateX(0%); }
+        100% { transform: translateX(100%); }
+    }
+
+    @keyframes shimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    .quiz-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid rgba(108, 92, 231, 0.1);
+        position: relative;
+    }
+
+    .quiz-category {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: #ffffff;
+        font-size: 1rem;
+    }
+
+    .quiz-category i {
+        font-size: 1.2rem;
+        padding: 0.5rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border-radius: 8px;
+        animation: iconGlow 3s ease-in-out infinite;
+    }
+
+    .quiz-difficulty {
+        background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    @keyframes iconGlow {
+        0%, 100% { 
+            box-shadow: 0 0 0 rgba(108, 92, 231, 0.4);
+        }
+        50% { 
+            box-shadow: 0 0 20px rgba(108, 92, 231, 0.6);
+        }
+    }
+
+    .quiz-body p {
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+        line-height: 1.5;
+        position: relative;
+        padding-left: 1rem;
+    }
+
+    .quiz-body p::before {
+        content: 'Q';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 24px;
+        height: 24px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .quiz-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        position: relative;
+    }
+
+    .quiz-options::before {
+        content: '✨';
+        position: absolute;
+        right: -15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.5rem;
+        animation: sparkle 3s ease-in-out infinite;
+    }
+
+    @keyframes sparkle {
+        0%, 100% { 
+            opacity: 0.3;
+            transform: translateY(-50%) rotate(0deg);
+        }
+        50% { 
+            opacity: 1;
+            transform: translateY(-50%) rotate(180deg);
+        }
+    }
+
+    /* Quiz Progress Animation */
+    .quiz-progress {
+        margin-top: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .progress-dots {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .progress-dots::before {
+        content: 'Progress:';
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-right: 0.5rem;
+        font-weight: 600;
+    }
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .dot.active {
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        box-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+        animation: dotGlow 2s ease-in-out infinite;
+    }
+
+    .dot.active::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        z-index: -1;
+        animation: dotRing 2s ease-in-out infinite;
+    }
+
+    @keyframes dotGlow {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+    }
+
+    @keyframes dotRing {
+        0%, 100% { 
+            transform: scale(1);
+            opacity: 0.3;
+        }
+        50% { 
+            transform: scale(1.5);
+            opacity: 0.1;
+        }
+    }
+
+    .quiz-timer {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+    }
+
+    .quiz-timer i {
+        color: #ffffff;
+        font-size: 0.9rem;
+        animation: timerPulse 1s ease-in-out infinite;
+    }
+
+    .time {
+        font-family: 'Courier New', monospace;
+        font-weight: 700;
+        color: #ffffff;
+        font-size: 0.9rem;
+        min-width: 35px;
+        text-align: center;
+    }
+
+    @keyframes timerPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    @keyframes timeFlash {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    .quiz-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        position: relative;
+    }
+
+    .option {
+        padding: 1rem 1.25rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        font-size: 0.95rem;
+        color: #ffffff;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        background: rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .option::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(108, 92, 231, 0.1), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .option:hover {
+        border-color: rgba(255, 255, 255, 0.6);
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(5px);
+        color: #ffffff;
+    }
+
+    .option:hover::before {
+        left: 100%;
+    }
+
+    .option.correct {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        border-color: #10b981;
+        font-weight: 600;
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .option.correct::after {
+        content: '✓';
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    /* Features Section */
+    .features-section {
+        padding: 8rem 0;
+        background: #f8fafc;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 5rem;
+    }
+
+    .section-header h2 {
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+
+    .section-header .subtitle {
+        font-size: 1.2rem;
+        color: var(--text-light);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .feature-card {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        height: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        font-size: 2rem;
+        color: white;
+    }
+
+    .feature-card h4 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+
+    .feature-card p {
+        color: var(--text-light);
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+
+    /* Interactive Features Section */
+    .interactive-section {
+        padding: 8rem 0;
+        background: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .interactive-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .interactive-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .interactive-content h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+    }
+
+    .feature-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+        transform: translateX(10px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .feature-item i {
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        margin-top: 0.25rem;
+    }
+
+    .feature-item h5 {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .feature-item p {
+        color: var(--text-light);
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .interactive-demo {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 2rem;
+    }
+
+    .demo-container {
+        position: relative;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .demo-phone {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 30px;
+        padding: 2rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .demo-phone::before {
+        content: '';
+        position: absolute;
+        top: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+    }
+
+    .demo-screen {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .demo-quiz-interface {
+        text-align: center;
+    }
+
+    .demo-progress {
+        margin-bottom: 2rem;
+    }
+
+    .progress-bar {
+        background: #e2e8f0;
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+
+    .progress-fill {
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+        animation: pulse 2s infinite;
+    }
+
+    .progress-text {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        font-weight: 500;
+    }
+
+    .demo-question h4 {
+        font-size: 1.1rem;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+
+    .demo-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .demo-option {
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: var(--text-dark);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .demo-option.selected {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        border-color: var(--primary-color);
+        transform: scale(1.02);
+    }
+
+    .demo-timer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        color: var(--text-light);
+        font-weight: 500;
+    }
+
+    .timer-text {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .floating-icons {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .floating-icon {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .floating-icon i {
+        font-size: 1.2rem;
+        color: var(--primary-color);
+    }
+
+    .floating-icon.icon-1 {
+        top: 20%;
+        left: -10%;
+        animation-delay: 0s;
+    }
+
+    .floating-icon.icon-2 {
+        top: 60%;
+        right: -10%;
+        animation-delay: 1s;
+    }
+
+    .floating-icon.icon-3 {
+        bottom: 20%;
+        left: -5%;
+        animation-delay: 2s;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    .benefit-item {
+        padding: 2rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .benefit-item:hover {
+        transform: translateY(-5px);
+    }
+
+    .benefit-item h5 {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+
+    .benefit-item p {
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        padding: 8rem 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M30 30c0-16.569 13.431-30 30-30v30H30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        opacity: 0.1;
+    }
+
+    .cta-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .cta-section h2 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .cta-section .lead {
+        font-size: 1.3rem;
+        margin-bottom: 2.5rem;
+        opacity: 0.9;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .hero-content h1 {
+            font-size: 2.5rem;
+        }
+        
+        .hero-content .lead {
+            font-size: 1.1rem;
+        }
+        
+        .cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .btn-hero {
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .floating-quiz {
+            position: static;
+            margin-bottom: 2rem;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .floating-elements {
+            position: static;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            padding: 0 1rem;
+        }
+        
+        .hero-animation {
+            height: auto;
+            margin-top: 2rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2rem;
+        }
+        
+        .cta-section h2 {
+            font-size: 2rem;
+        }
+        
+        .interactive-content h2 {
+            font-size: 2rem;
+        }
+        
+        .feature-item {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .demo-phone {
+            padding: 1.5rem;
+        }
+        
+        .demo-screen {
+            padding: 1.5rem;
+        }
+        
+        .interactive-section {
+            padding: 4rem 0;
+        }
+        
+        .floating-icon {
+            display: none;
+        }
+        
+        .benefit-item {
+            padding: 1.5rem 0.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1>
+                        Master Knowledge with <span class="highlight">Quizmaster</span>
+                    </h1>
+                    <p class="lead">
+                        The ultimate quiz platform where learning meets competition. 
+                        Create engaging quizzes, challenge your knowledge, and compete with learners worldwide.
+                    </p>
+                    <div class="cta-buttons">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'dashboard' %}" class="btn-hero btn-hero-primary">
+                                <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                            </a>
+                            <a href="{% url 'quiz_list' %}" class="btn-hero btn-hero-outline">
+                                <i class="fas fa-list"></i> Browse Quizzes
+                            </a>
+                        {% else %}
+                            <a href="{% url 'register' %}" class="btn-hero btn-hero-primary">
+                                <i class="fas fa-rocket"></i> Get Started Free
+                            </a>
+                            <a href="{% url 'login' %}" class="btn-hero btn-hero-outline">
+                                <i class="fas fa-sign-in-alt"></i> Sign In
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-animation">
+                    <div class="floating-elements">
+                        <div class="floating-quiz">
+                            <div class="quiz-card">
+                                <div class="quiz-header">
+                                    <div class="quiz-category">
+                                        <i class="fas fa-globe-americas"></i>
+                                        <span>Geography</span>
+                                    </div>
+                                    <div class="quiz-difficulty">Medium</div>
+                                </div>
+                                <div class="quiz-body">
+                                    <p>What is the capital of France?</p>
+                                    <div class="quiz-options">
+                                        <div class="option">A) London</div>
+                                        <div class="option correct">B) Paris</div>
+                                        <div class="option">C) Berlin</div>
+                                        <div class="option">D) Madrid</div>
+                                    </div>
+                                    <div class="quiz-progress">
+                                        <div class="progress-dots">
+                                            <span class="dot active"></span>
+                                            <span class="dot active"></span>
+                                            <span class="dot"></span>
+                                            <span class="dot"></span>
+                                        </div>
+                                        <div class="quiz-timer">
+                                            <i class="fas fa-clock"></i>
+                                            <span class="time">0:45</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="floating-quiz">
+                            <div class="quiz-card">
+                                <div class="quiz-header">
+                                    <div class="quiz-category">
+                                        <i class="fas fa-atom"></i>
+                                        <span>Science</span>
+                                    </div>
+                                    <div class="quiz-difficulty">Easy</div>
+                                </div>
+                                <div class="quiz-body">
+                                    <p>What is the chemical formula for water?</p>
+                                    <div class="quiz-options">
+                                        <div class="option">A) H2SO4</div>
+                                        <div class="option correct">B) H2O</div>
+                                        <div class="option">C) CO2</div>
+                                        <div class="option">D) NaCl</div>
+                                    </div>
+                                    <div class="quiz-progress">
+                                        <div class="progress-dots">
+                                            <span class="dot active"></span>
+                                            <span class="dot"></span>
+                                            <span class="dot"></span>
+                                            <span class="dot"></span>
+                                        </div>
+                                        <div class="quiz-timer">
+                                            <i class="fas fa-clock"></i>
+                                            <span class="time">1:20</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Why Choose Quizmaster?</h2>
+            <p class="subtitle">
+                Transform your learning experience with our comprehensive quiz platform designed for modern education
+            </p>
+        </div>
+        
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto">
+                <div class="about-content">
+                    <h3 class="text-center mb-4">Revolutionizing Online Learning</h3>
+                    <p class="text-center mb-4" style="font-size: 1.1rem; color: var(--text-light);">
+                        Quizmaster isn't just another quiz platform – it's a comprehensive learning ecosystem designed to make education engaging, competitive, and effective. Whether you're a student looking to test your knowledge or an educator wanting to create interactive assessments, Quizmaster provides all the tools you need.
+                    </p>
+                    
+                    <div class="row text-center mt-5">
+                        <div class="col-md-4">
+                            <div class="benefit-item">
+                                <i class="fas fa-graduation-cap" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                                <h5>For Students</h5>
+                                <p>Test your knowledge, track progress, and compete with peers worldwide</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="benefit-item">
+                                <i class="fas fa-chalkboard-teacher" style="font-size: 3rem; color: var(--secondary-color); margin-bottom: 1rem;"></i>
+                                <h5>For Educators</h5>
+                                <p>Create engaging assessments, monitor student progress, and generate detailed reports</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="benefit-item">
+                                <i class="fas fa-building" style="font-size: 3rem; color: var(--accent-color); margin-bottom: 1rem;"></i>
+                                <h5>For Organizations</h5>
+                                <p>Conduct training assessments, skill evaluations, and team competitions</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h4>Create Custom Quizzes</h4>
+                    <p>Build engaging quizzes with multiple question types, customize difficulty levels, and track detailed performance analytics.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h4>Compete & Achieve</h4>
+                    <p>Challenge yourself on global leaderboards, earn achievements, and track your progress against other learners.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4>Advanced Analytics</h4>
+                    <p>Get detailed insights into your learning patterns, identify strengths and weaknesses, and optimize your study approach.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4>Community Learning</h4>
+                    <p>Join a vibrant community of learners, share knowledge, and learn from diverse perspectives worldwide.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h4>Flexible Learning</h4>
+                    <p>Learn at your own pace with timed quizzes, instant feedback, and the ability to retry and improve your scores.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4>Secure & Reliable</h4>
+                    <p>Your data is protected with enterprise-grade security, ensuring a safe and reliable learning environment.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Interactive Features Section -->
+<section class="interactive-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="interactive-content">
+                    <h2 class="mb-4">Experience Interactive Learning</h2>
+                    <p class="mb-4" style="font-size: 1.1rem; color: var(--text-light);">
+                        Our platform uses cutting-edge technology to create an engaging learning environment. 
+                        From real-time feedback to dynamic difficulty adjustment, every feature is designed 
+                        to enhance your learning experience.
+                    </p>
+                    
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <i class="fas fa-bolt"></i>
+                            <div>
+                                <h5>Instant Feedback</h5>
+                                <p>Get immediate results and explanations for every question</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-brain"></i>
+                            <div>
+                                <h5>Adaptive Learning</h5>
+                                <p>Difficulty adjusts based on your performance and learning pace</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-mobile-alt"></i>
+                            <div>
+                                <h5>Mobile Optimized</h5>
+                                <p>Learn anywhere, anytime with our responsive design</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-share-alt"></i>
+                            <div>
+                                <h5>Easy Sharing</h5>
+                                <p>Share quizzes with friends, students, or colleagues instantly</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="interactive-demo">
+                    <div class="demo-container">
+                        <div class="demo-phone">
+                            <div class="demo-screen">
+                                <div class="demo-quiz-interface">
+                                    <div class="demo-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 60%;"></div>
+                                        </div>
+                                        <span class="progress-text">Question 3 of 5</span>
+                                    </div>
+                                    <div class="demo-question">
+                                        <h4>What is the largest planet in our solar system?</h4>
+                                        <div class="demo-options">
+                                            <div class="demo-option">A) Earth</div>
+                                            <div class="demo-option selected">B) Jupiter</div>
+                                            <div class="demo-option">C) Saturn</div>
+                                            <div class="demo-option">D) Mars</div>
+                                        </div>
+                                    </div>
+                                    <div class="demo-timer">
+                                        <i class="fas fa-clock"></i>
+                                        <span class="timer-text">00:45</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="floating-icons">
+                            <div class="floating-icon icon-1">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="floating-icon icon-2">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="floating-icon icon-3">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to Start Your Learning Journey?</h2>
+            <p class="lead">
+                Join thousands of learners and educators who trust Quizmaster for their educational needs
+            </p>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'register' %}" class="btn-hero btn-hero-primary">
+                    <i class="fas fa-rocket"></i> Join Free Today
+                </a>
+            {% else %}
+                <a href="{% url 'dashboard' %}" class="btn-hero btn-hero-primary">
+                    <i class="fas fa-tachometer-alt"></i> Continue Learning
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/landing.js' %}"></script>
+<script>
+    // Interactive demo animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate progress bar
+        const progressBar = document.querySelector('.progress-fill');
+        if (progressBar) {
+            let width = 0;
+            const interval = setInterval(() => {
+                width += 1;
+                progressBar.style.width = width + '%';
+                if (width >= 60) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progressBar.style.width = '0%';
+                        width = 0;
+                        // Restart animation
+                        const restartInterval = setInterval(() => {
+                            width += 1;
+                            progressBar.style.width = width + '%';
+                            if (width >= 60) {
+                                clearInterval(restartInterval);
+                            }
+                        }, 100);
+                    }, 2000);
+                }
+            }, 100);
+        }
+
+        // Animate timer
+        const timerText = document.querySelector('.timer-text');
+        if (timerText) {
+            let seconds = 45;
+            const timerInterval = setInterval(() => {
+                seconds--;
+                if (seconds < 0) {
+                    seconds = 45;
+                }
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                timerText.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // Animate quiz options
+        const options = document.querySelectorAll('.demo-option');
+        let currentSelected = 1; // Start with B selected
+        
+        setInterval(() => {
+            options.forEach(option => option.classList.remove('selected'));
+            options[currentSelected].classList.add('selected');
+            currentSelected = (currentSelected + 1) % options.length;
+        }, 3000);
+
+        // Animate floating quiz cards
+        const floatingQuizOptions = document.querySelectorAll('.floating-quiz .option');
+        floatingQuizOptions.forEach((option, index) => {
+            // Add hover effect that simulates selection
+            option.addEventListener('mouseenter', function() {
+                this.style.background = 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))';
+                this.style.color = 'white';
+                this.style.transform = 'translateX(10px) scale(1.05)';
+            });
+            
+            option.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('correct')) {
+                    this.style.background = 'rgba(255, 255, 255, 0.1)';
+                    this.style.color = '#ffffff';
+                    this.style.transform = 'translateX(0) scale(1)';
+                }
+            });
+        });
+
+        // Animate progress dots
+        const progressDots = document.querySelectorAll('.dot');
+        let currentDot = 0;
+        
+        setInterval(() => {
+            progressDots.forEach(dot => dot.classList.remove('active'));
+            progressDots[currentDot].classList.add('active');
+            currentDot = (currentDot + 1) % progressDots.length;
+        }, 1500);
+
+        // Animate timer countdown
+        const timerElements = document.querySelectorAll('.time');
+        timerElements.forEach(timer => {
+            let timeLeft = parseInt(timer.textContent.split(':')[1]);
+            
+            setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    timeLeft = 60;
+                }
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Flash red when time is low
+                if (timeLeft <= 10) {
+                    timer.style.color = '#E84393';
+                } else {
+                    timer.style.color = 'var(--primary-color)';
+                }
+            }, 1000);
+        });
+
+        // Add typing effect to quiz questions
+        const quizQuestions = document.querySelectorAll('.quiz-body p');
+        quizQuestions.forEach(question => {
+            const originalText = question.textContent;
+            question.textContent = '';
+            let i = 0;
+            
+            function typeWriter() {
+                if (i < originalText.length) {
+                    question.textContent += originalText.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 50);
+                } else {
+                    // Restart typing after a delay
+                    setTimeout(() => {
+                        question.textContent = '';
+                        i = 0;
+                        setTimeout(typeWriter, 1000);
+                    }, 5000);
+                }
+            }
+            
+            setTimeout(typeWriter, Math.random() * 2000);
+        });
+
+        // Intersection Observer for feature cards
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe feature cards
+        const featureCards = document.querySelectorAll('.feature-card');
+        featureCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(50px)';
+            card.style.transition = `all 0.6s ease ${index * 0.1}s`;
+            observer.observe(card);
+        });
+
+        // Observe feature items
+        const featureItems = document.querySelectorAll('.feature-item');
+        featureItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-50px)';
+            item.style.transition = `all 0.6s ease ${index * 0.2}s`;
+            observer.observe(item);
+        });
+
+        // Hero animation
+        const heroContent = document.querySelector('.hero-content');
+        if (heroContent) {
+            heroContent.style.opacity = '0';
+            heroContent.style.transform = 'translateY(50px)';
+            heroContent.style.transition = 'all 0.8s ease';
+            
+            setTimeout(() => {
+                heroContent.style.opacity = '1';
+                heroContent.style.transform = 'translateY(0)';
+            }, 300);
+        }
+
+        // Floating quiz animation enhancement
+        const floatingQuizzes = document.querySelectorAll('.floating-quiz');
+        floatingQuizzes.forEach((quiz, index) => {
+            quiz.style.opacity = '0';
+            quiz.style.transform = 'translateY(50px) scale(0.9)';
+            quiz.style.transition = `all 0.8s ease ${index * 0.3}s`;
+            
+            setTimeout(() => {
+                quiz.style.opacity = '1';
+                quiz.style.transform = 'translateY(0) scale(1)';
+            }, 800 + (index * 300));
+        });
+
+        // Enhanced card interactions
+        floatingQuizzes.forEach((quiz, index) => {
+            quiz.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-15px) scale(1.05)';
+                this.style.zIndex = '10';
+            });
+            
+            quiz.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.zIndex = index === 0 ? '2' : '3';
+            });
+        });
+
+        // Add hover effects to CTA buttons
+        const ctaButtons = document.querySelectorAll('.btn-hero');
+        ctaButtons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.05)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(-3px) scale(1)';
+            });
+        });
+    });
+
+    // Smooth scrolling for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

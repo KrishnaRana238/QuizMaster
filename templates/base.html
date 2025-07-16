@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Quizmaster{% endblock %}</title>
+    {% load static %}
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --text-dark: #1a1a1a;
+            --text-light: #6b7280;
+            --bg-light: #f8fafc;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Modern Navigation */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            transform: translateY(-2px);
+            color: white !important;
+        }
+
+        .navbar-brand i {
+            margin-right: 8px;
+            font-size: 1.8rem;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin: 0 0.25rem;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white !important;
+            transform: translateY(-1px);
+        }
+
+        .navbar-nav .nav-link i {
+            margin-right: 6px;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-menu {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-item {
+            color: var(--text-dark);
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 0 0.5rem;
+        }
+
+        .dropdown-item:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .dropdown-item i {
+            margin-right: 8px;
+            width: 16px;
+        }
+
+        /* Modern Alert Messages */
+        .alert {
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            border-left: 4px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(102, 126, 234, 0.05));
+            border-left: 4px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+            border-left: 4px solid var(--warning-color);
+            color: var(--warning-color);
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+            border-left: 4px solid var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        /* Modern Buttons */
+        .btn {
+            font-weight: 500;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-outline-primary {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Content wrapper */
+        main {
+            min-height: calc(100vh - 200px);
+        }
+
+        /* Modern Cards */
+        .card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 1.5rem;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.3rem;
+            }
+            
+            .navbar-nav .nav-link {
+                padding: 0.75rem 1rem !important;
+                margin: 0.25rem 0;
+            }
+            
+            .btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'landing' %}{% endif %}">
+                <i class="fas fa-brain"></i> Quizmaster
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'leaderboard' %}">
+                                <i class="fas fa-trophy"></i> Leaderboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'quiz_list' %}">
+                                <i class="fas fa-list"></i> Quizzes
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notificationCount" style="display: none;">
+                                    0
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" id="notificationDropdownMenu">
+                                <li><h6 class="dropdown-header">Notifications</h6></li>
+                                <li><div class="dropdown-item-text text-center" id="notificationLoading">Loading...</div></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-center" href="#" id="markAllRead">Mark all as read</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> {{ user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'profile' %}">
+                                    <i class="fas fa-user-circle"></i> My Profile
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'edit_profile' %}">
+                                    <i class="fas fa-edit"></i> Edit Profile
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'logout' %}">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">
+                                <i class="fas fa-user-plus"></i> Register
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Modern Footer -->
+    <footer class="footer mt-5">
+        <div class="footer-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="footer-brand">
+                            <h4><i class="fas fa-brain"></i> Quizmaster</h4>
+                            <p class="footer-description">
+                                The ultimate quiz platform for learning and competition. 
+                                Challenge yourself and compete with learners worldwide.
+                            </p>
+                            <div class="social-links">
+                                <a href="#" class="social-link">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="#" class="social-link">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-2 col-md-3 col-sm-6 mb-4">
+                        <div class="footer-section">
+                            <h6 class="footer-title">Quick Links</h6>
+                            <ul class="footer-links">
+                                <li><a href="{% url 'landing' %}">Home</a></li>
+                                <li><a href="{% url 'quiz_list' %}">Quizzes</a></li>
+                                <li><a href="{% url 'leaderboard' %}">Leaderboard</a></li>
+                                <li><a href="#about">About</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-2 col-md-3 col-sm-6 mb-4">
+                        <div class="footer-section">
+                            <h6 class="footer-title">Account</h6>
+                            <ul class="footer-links">
+                                {% if user.is_authenticated %}
+                                    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                                {% else %}
+                                    <li><a href="{% url 'login' %}">Login</a></li>
+                                    <li><a href="{% url 'register' %}">Register</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="footer-section">
+                            <h6 class="footer-title">Stay Updated</h6>
+                            <p class="footer-newsletter-text">
+                                Subscribe to get updates about new quizzes and features.
+                            </p>
+                            <div class="newsletter-form">
+                                <div class="input-group">
+                                    <input type="email" class="form-control" placeholder="Enter your email">
+                                    <button class="btn btn-primary" type="button">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr class="footer-divider">
+                
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="footer-copyright">
+                            &copy; 2025 Quizmaster. All rights reserved.
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="footer-legal">
+                            <a href="#privacy">Privacy Policy</a>
+                            <a href="#terms">Terms of Service</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        /* Modern Footer Styles */
+        .footer {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .footer-content {
+            padding: 4rem 0 2rem;
+            position: relative;
+        }
+
+        .footer-brand h4 {
+            color: white;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .footer-brand i {
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+        }
+
+        .footer-description {
+            color: #b0b0b0;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .footer-title {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .footer-newsletter-text {
+            color: #b0b0b0;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .newsletter-form .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .newsletter-form .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            color: white;
+        }
+
+        .newsletter-form .form-control::placeholder {
+            color: #b0b0b0;
+        }
+
+        .newsletter-form .btn {
+            border-radius: 0 8px 8px 0;
+            padding: 0.75rem 1rem;
+        }
+
+        .footer-divider {
+            border-color: rgba(255, 255, 255, 0.1);
+            margin: 2rem 0 1rem;
+        }
+
+        .footer-copyright {
+            color: #b0b0b0;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: flex-end;
+        }
+
+        .footer-legal a {
+            color: #b0b0b0;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-legal a:hover {
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                padding: 3rem 0 1rem;
+            }
+            
+            .footer-legal {
+                justify-content: center;
+                margin-top: 1rem;
+            }
+            
+            .social-links {
+                justify-content: center;
+            }
+        }
+
+        /* Notification Styles */
+        .notification-badge {
+            font-size: 0.7rem;
+            min-width: 1.2rem;
+            height: 1.2rem;
+            line-height: 1.2rem;
+            text-align: center;
+        }
+
+        .notification-dropdown {
+            width: 350px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+
+        .notification-item.unread {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+
+        .notification-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .notification-message {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .notification-time {
+            font-size: 0.7rem;
+            color: #999;
+        }
+
+        .notification-type-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 0.6rem;
+            border-radius: 3px;
+            margin-right: 6px;
+        }
+
+        .notification-type-achievement {
+            background-color: #ffd700;
+            color: #333;
+        }
+
+        .notification-type-quiz_result {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .notification-type-rank_change {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .notification-type-new_quiz {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .notification-type-system {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+    
+    {% if user.is_authenticated %}
+    <script>
+        // Notification system
+        class NotificationManager {
+            constructor() {
+                this.notificationCount = document.getElementById('notificationCount');
+                this.notificationDropdownMenu = document.getElementById('notificationDropdownMenu');
+                this.markAllReadBtn = document.getElementById('markAllRead');
+                this.loadingIndicator = document.getElementById('notificationLoading');
+                
+                this.init();
+            }
+            
+            init() {
+                this.loadNotifications();
+                this.bindEvents();
+                
+                // Refresh notifications every 30 seconds
+                setInterval(() => {
+                    this.loadNotifications();
+                }, 30000);
+            }
+            
+            bindEvents() {
+                if (this.markAllReadBtn) {
+                    this.markAllReadBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.markAllAsRead();
+                    });
+                }
+            }
+            
+            async loadNotifications() {
+                try {
+                    const response = await fetch('/api/notifications/');
+                    const data = await response.json();
+                    
+                    this.updateNotificationCount(data.unread_count);
+                    this.renderNotifications(data.notifications);
+                } catch (error) {
+                    console.error('Error loading notifications:', error);
+                }
+            }
+            
+            updateNotificationCount(count) {
+                if (this.notificationCount) {
+                    if (count > 0) {
+                        this.notificationCount.textContent = count;
+                        this.notificationCount.style.display = 'block';
+                    } else {
+                        this.notificationCount.style.display = 'none';
+                    }
+                }
+            }
+            
+            renderNotifications(notifications) {
+                if (!this.notificationDropdownMenu) return;
+                
+                // Clear existing notifications except header and footer
+                const items = this.notificationDropdownMenu.querySelectorAll('.notification-item');
+                items.forEach(item => item.remove());
+                
+                if (notifications.length === 0) {
+                    const noNotifications = document.createElement('li');
+                    noNotifications.innerHTML = '<div class="dropdown-item-text text-center text-muted">No notifications</div>';
+                    this.notificationDropdownMenu.insertBefore(noNotifications, this.notificationDropdownMenu.querySelector('hr'));
+                } else {
+                    notifications.forEach(notification => {
+                        const item = this.createNotificationItem(notification);
+                        this.notificationDropdownMenu.insertBefore(item, this.notificationDropdownMenu.querySelector('hr'));
+                    });
+                }
+                
+                // Hide loading indicator
+                if (this.loadingIndicator) {
+                    this.loadingIndicator.style.display = 'none';
+                }
+            }
+            
+            createNotificationItem(notification) {
+                const li = document.createElement('li');
+                li.className = 'notification-item';
+                
+                const timeAgo = this.getTimeAgo(new Date(notification.created_at));
+                
+                li.innerHTML = `
+                    <div class="notification-content">
+                        <span class="notification-type-badge notification-type-${notification.type}">${notification.type}</span>
+                        <div class="notification-title">${notification.title}</div>
+                        <div class="notification-message">${notification.message}</div>
+                        <div class="notification-time">${timeAgo}</div>
+                    </div>
+                `;
+                
+                li.addEventListener('click', () => {
+                    this.markAsRead(notification.id);
+                });
+                
+                return li;
+            }
+            
+            async markAsRead(notificationId) {
+                try {
+                    await fetch(`/api/notifications/${notificationId}/read/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': this.getCsrfToken()
+                        }
+                    });
+                    this.loadNotifications();
+                } catch (error) {
+                    console.error('Error marking notification as read:', error);
+                }
+            }
+            
+            async markAllAsRead() {
+                try {
+                    await fetch('/api/notifications/read-all/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': this.getCsrfToken()
+                        }
+                    });
+                    this.loadNotifications();
+                } catch (error) {
+                    console.error('Error marking all notifications as read:', error);
+                }
+            }
+            
+            getCsrfToken() {
+                return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+            }
+            
+            getTimeAgo(date) {
+                const now = new Date();
+                const diff = now - date;
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(minutes / 60);
+                const days = Math.floor(hours / 24);
+                
+                if (days > 0) return `${days}d ago`;
+                if (hours > 0) return `${hours}h ago`;
+                if (minutes > 0) return `${minutes}m ago`;
+                return 'Just now';
+            }
+        }
+        
+        // Initialize notification manager when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new NotificationManager();
+        });
+    </script>
+    {% endif %}
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

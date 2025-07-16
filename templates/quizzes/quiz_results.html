@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Quiz Results - {{ submission.quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-{% if submission.percentage_score >= 80 %}success{% elif submission.percentage_score >= 60 %}warning{% else %}danger{% endif %} text-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3><i class="fas fa-chart-line"></i> Quiz Results: {{ submission.quiz.title }}</h3>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <h4>{{ submission.score }}/{{ submission.total_points }}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Score Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Score</h5>
+                                    <h3 class="text-primary">{{ submission.score }}/{{ submission.total_points }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Percentage</h5>
+                                    <h3 class="text-{% if submission.percentage_score >= 80 %}success{% elif submission.percentage_score >= 60 %}warning{% else %}danger{% endif %}">
+                                        {{ submission.percentage_score }}%
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Questions</h5>
+                                    <h3 class="text-info">{{ submission.quiz.total_questions }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Grade</h5>
+                                    <h3 class="text-{% if submission.percentage_score >= 80 %}success{% elif submission.percentage_score >= 60 %}warning{% else %}danger{% endif %}">
+                                        {% if submission.percentage_score >= 90 %}A+
+                                        {% elif submission.percentage_score >= 80 %}A
+                                        {% elif submission.percentage_score >= 70 %}B
+                                        {% elif submission.percentage_score >= 60 %}C
+                                        {% elif submission.percentage_score >= 50 %}D
+                                        {% else %}F{% endif %}
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Overall Performance</span>
+                            <span>{{ submission.percentage_score }}%</span>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-{% if submission.percentage_score >= 80 %}success{% elif submission.percentage_score >= 60 %}warning{% else %}danger{% endif %}" 
+                                 style="width: {{ submission.percentage_score }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Detailed Results -->
+                    <h5 class="mb-3"><i class="fas fa-list"></i> Detailed Results</h5>
+                    
+                    {% for answer in answers %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-1">
+                                    <div class="question-number-result {% if answer.is_correct %}correct{% else %}incorrect{% endif %}">
+                                        {{ forloop.counter }}
+                                    </div>
+                                </div>
+                                <div class="col-md-11">
+                                    <div class="question-content">
+                                        <h6>{{ answer.question.question_text }}</h6>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p><strong>Your Answer:</strong></p>
+                                                {% if answer.selected_choice %}
+                                                    <div class="answer-box {% if answer.is_correct %}correct{% else %}incorrect{% endif %}">
+                                                        <i class="fas fa-{% if answer.is_correct %}check{% else %}times{% endif %}"></i>
+                                                        {{ answer.selected_choice.choice_text }}
+                                                    </div>
+                                                {% elif answer.text_answer %}
+                                                    <div class="answer-box {% if answer.is_correct %}correct{% else %}incorrect{% endif %}">
+                                                        <i class="fas fa-{% if answer.is_correct %}check{% else %}times{% endif %}"></i>
+                                                        {{ answer.text_answer }}
+                                                    </div>
+                                                {% else %}
+                                                    <div class="answer-box no-answer">
+                                                        <i class="fas fa-question"></i>
+                                                        No answer provided
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><strong>Correct Answer:</strong></p>
+                                                {% if answer.question.question_type == 'mc' %}
+                                                    {% with answer.question.choices.all as choices %}
+                                                        {% for choice in choices %}
+                                                            {% if choice.is_correct %}
+                                                                <div class="answer-box correct">
+                                                                    <i class="fas fa-check"></i>
+                                                                    {{ choice.choice_text }}
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    {% endwith %}
+                                                {% elif answer.question.question_type == 'tf' %}
+                                                    {% with answer.question.choices.all as choices %}
+                                                        {% for choice in choices %}
+                                                            {% if choice.is_correct %}
+                                                                <div class="answer-box correct">
+                                                                    <i class="fas fa-check"></i>
+                                                                    {{ choice.choice_text }}
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    {% endwith %}
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                Points: {{ answer.question.points }}
+                                                {% if answer.is_correct %}
+                                                    <span class="text-success">✓ Earned</span>
+                                                {% else %}
+                                                    <span class="text-danger">✗ Lost</span>
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- Action Buttons -->
+                    <div class="text-center mt-4">
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-tachometer-alt"></i> Back to Dashboard
+                        </a>
+                        <a href="{% url 'leaderboard' %}" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-trophy"></i> View Leaderboard
+                        </a>
+                        <a href="{% url 'quiz_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-list"></i> Take Another Quiz
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.question-number-result {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.question-number-result.correct {
+    background-color: #28a745;
+}
+
+.question-number-result.incorrect {
+    background-color: #dc3545;
+}
+
+.answer-box {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 2px solid;
+    margin-bottom: 10px;
+}
+
+.answer-box.correct {
+    background-color: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.answer-box.incorrect {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+}
+
+.answer-box.no-answer {
+    background-color: #f8f9fa;
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.answer-box i {
+    margin-right: 8px;
+}
+
+.question-content {
+    padding-left: 15px;
+}
+
+.question-content h6 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.progress {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+@media (max-width: 768px) {
+    .question-number-result {
+        width: 30px;
+        height: 30px;
+        font-size: 1rem;
+    }
+    
+    .answer-box {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .question-content {
+        padding-left: 10px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate progress bar
+    const progressBar = document.querySelector('.progress-bar');
+    if (progressBar) {
+        setTimeout(() => {
+            progressBar.style.width = '{{ submission.percentage_score }}%';
+        }, 500);
+    }
+    
+    // Add animation to answer boxes
+    const answerBoxes = document.querySelectorAll('.answer-box');
+    answerBoxes.forEach((box, index) => {
+        setTimeout(() => {
+            box.style.opacity = '0';
+            box.style.transform = 'translateY(20px)';
+            box.style.transition = 'all 0.5s ease';
+            
+            setTimeout(() => {
+                box.style.opacity = '1';
+                box.style.transform = 'translateY(0)';
+            }, 100);
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}

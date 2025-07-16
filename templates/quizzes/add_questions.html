@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Questions - {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h3><i class="fas fa-question-circle"></i> Add Questions to: {{ quiz.title }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.question_text.id_for_label }}" class="form-label">Question *</label>
+                            {{ form.question_text }}
+                            {% if form.question_text.errors %}
+                                <div class="text-danger">{{ form.question_text.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.question_type.id_for_label }}" class="form-label">Question Type *</label>
+                                    {{ form.question_type }}
+                                    {% if form.question_type.errors %}
+                                        <div class="text-danger">{{ form.question_type.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.points.id_for_label }}" class="form-label">Points *</label>
+                                    {{ form.points }}
+                                    {% if form.points.errors %}
+                                        <div class="text-danger">{{ form.points.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="choices-container" style="display: none;">
+                            <h5>Answer Choices</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Choice A</label>
+                                        <input type="text" name="choices" class="form-control" placeholder="Enter choice A">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Choice B</label>
+                                        <input type="text" name="choices" class="form-control" placeholder="Enter choice B">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Choice C</label>
+                                        <input type="text" name="choices" class="form-control" placeholder="Enter choice C">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Choice D</label>
+                                        <input type="text" name="choices" class="form-control" placeholder="Enter choice D">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Correct Answer</label>
+                                <select name="correct_choice" class="form-select">
+                                    <option value="0">Choice A</option>
+                                    <option value="1">Choice B</option>
+                                    <option value="2">Choice C</option>
+                                    <option value="3">Choice D</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div id="tf-container" style="display: none;">
+                            <h5>True/False Answer</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Correct Answer</label>
+                                <select name="tf_answer" class="form-select">
+                                    <option value="True">True</option>
+                                    <option value="False">False</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-plus"></i> Add Question
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Quiz Questions ({{ questions.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if questions %}
+                        <div class="list-group">
+                            {% for question in questions %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">Q{{ question.order }}: {{ question.question_text|truncatewords:8 }}</h6>
+                                        <small class="text-muted">{{ question.get_question_type_display }} - {{ question.points }} points</small>
+                                    </div>
+                                    <small class="text-muted">{{ question.choices.count }} choices</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No questions added yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5><i class="fas fa-info-circle"></i> Quiz Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Title:</strong> {{ quiz.title }}</p>
+                    <p><strong>Description:</strong> {{ quiz.description|truncatewords:10 }}</p>
+                    <p><strong>Time Limit:</strong> {{ quiz.time_limit }} minutes</p>
+                    <p><strong>Max Attempts:</strong> {{ quiz.max_attempts }}</p>
+                    <p><strong>Created:</strong> {{ quiz.created_at|date:"M d, Y" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const questionTypeSelect = document.getElementById('question-type-select');
+    const choicesContainer = document.getElementById('choices-container');
+    const tfContainer = document.getElementById('tf-container');
+    
+    function toggleContainers() {
+        const selectedType = questionTypeSelect.value;
+        
+        if (selectedType === 'mc') {
+            choicesContainer.style.display = 'block';
+            tfContainer.style.display = 'none';
+        } else if (selectedType === 'tf') {
+            choicesContainer.style.display = 'none';
+            tfContainer.style.display = 'block';
+        } else {
+            choicesContainer.style.display = 'none';
+            tfContainer.style.display = 'none';
+        }
+    }
+    
+    questionTypeSelect.addEventListener('change', toggleContainers);
+    toggleContainers(); // Initial call
+});
+</script>
+{% endblock %}

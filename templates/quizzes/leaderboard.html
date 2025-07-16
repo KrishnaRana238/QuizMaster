@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Leaderboard - Quizmaster{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-6 mb-4">
+                <i class="fas fa-trophy text-warning"></i> Leaderboard
+            </h1>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5><i class="fas fa-medal"></i> Top Performers</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_users %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Username</th>
+                                        <th>Quizzes Taken</th>
+                                        <th>Total Score</th>
+                                        <th>Average Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for profile in top_users %}
+                                    <tr>
+                                        <td>
+                                            <div class="leaderboard-rank {% if forloop.counter == 1 %}first{% elif forloop.counter == 2 %}second{% elif forloop.counter == 3 %}third{% endif %}">
+                                                {% if forloop.counter == 1 %}
+                                                    <i class="fas fa-trophy"></i>
+                                                {% elif forloop.counter == 2 %}
+                                                    <i class="fas fa-medal"></i>
+                                                {% elif forloop.counter == 3 %}
+                                                    <i class="fas fa-award"></i>
+                                                {% else %}
+                                                    {{ forloop.counter }}
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-2">
+                                                    {{ profile.user.username|first|upper }}
+                                                </div>
+                                                <div>
+                                                    <strong>{{ profile.user.username }}</strong>
+                                                    {% if profile.is_admin %}
+                                                        <span class="badge bg-success ms-2">Admin</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ profile.total_quizzes_taken }}</td>
+                                        <td>{{ profile.total_score }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress me-2" style="width: 60px; height: 10px;">
+                                                    <div class="progress-bar {% if profile.average_score >= 80 %}bg-success{% elif profile.average_score >= 60 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                                         style="width: {{ profile.average_score }}%"></div>
+                                                </div>
+                                                <span class="badge bg-{% if profile.average_score >= 80 %}success{% elif profile.average_score >= 60 %}warning{% else %}danger{% endif %}">
+                                                    {{ profile.average_score|floatformat:1 }}%
+                                                </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-trophy fa-4x text-muted mb-4"></i>
+                            <h4 class="text-muted">No scores yet!</h4>
+                            <p class="text-muted">Be the first to take a quiz and appear on the leaderboard.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="fas fa-clock"></i> Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_submissions %}
+                        <div class="timeline">
+                            {% for submission in recent_submissions %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong>{{ submission.user.username }}</strong>
+                                            <p class="mb-1 text-muted">{{ submission.quiz.title }}</p>
+                                            <small class="text-muted">{{ submission.submitted_at|timesince }} ago</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="badge bg-{% if submission.percentage_score >= 80 %}success{% elif submission.percentage_score >= 60 %}warning{% else %}danger{% endif %}">
+                                                {{ submission.percentage_score|floatformat:0 }}%
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No recent activity</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="fas fa-chart-pie"></i> Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="stat-item">
+                                <div class="stat-number">{{ top_users|length }}</div>
+                                <div class="stat-label">Active Users</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-item">
+                                <div class="stat-number">{{ recent_submissions|length }}</div>
+                                <div class="stat-label">Recent Quizzes</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if user.is_authenticated %}
+            <div class="card mt-3">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-user"></i> Your Stats</h5>
+                </div>
+                <div class="card-body">
+                    {% if user.userprofile %}
+                        <div class="row text-center">
+                            <div class="col-12 mb-3">
+                                <div class="stat-item">
+                                    <div class="stat-number">{{ user.userprofile.total_quizzes_taken }}</div>
+                                    <div class="stat-label">Quizzes Taken</div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="stat-item">
+                                    <div class="stat-number">{{ user.userprofile.average_score|floatformat:1 }}%</div>
+                                    <div class="stat-label">Average Score</div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted">Take a quiz to see your stats!</p>
+                            <a href="{% url 'quiz_list' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-play"></i> Take Quiz
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -23px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #007bff;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #dee2e6;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid #007bff;
+}
+
+.leaderboard-rank {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    width: 40px;
+}
+
+.leaderboard-rank.first {
+    color: #ffd700;
+}
+
+.leaderboard-rank.second {
+    color: #c0c0c0;
+}
+
+.leaderboard-rank.third {
+    color: #cd7f32;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+    
+    .avatar-circle {
+        width: 30px;
+        height: 30px;
+        font-size: 1rem;
+    }
+    
+    .timeline {
+        padding-left: 20px;
+    }
+    
+    .timeline-marker {
+        left: -18px;
+        width: 10px;
+        height: 10px;
+    }
+}
+</style>
+{% endblock %}

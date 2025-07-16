@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile_user.get_full_name|default:profile_user.username }} - Profile{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <!-- Profile Card -->
+        <div class="col-xl-4 col-lg-5 col-md-6 mb-4">
+            <div class="card profile-card">
+                <div class="card-body text-center">
+                    <div class="profile-avatar mb-3">
+                        {% if profile.profile_picture %}
+                            <img src="{{ profile.profile_picture.url }}" alt="Profile" class="rounded-circle" width="120" height="120">
+                        {% else %}
+                            <div class="avatar-placeholder">
+                                <span class="avatar-initials">{{ profile.get_initials }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <h4 class="card-title mb-1">{{ profile_user.get_full_name|default:profile_user.username }}</h4>
+                    <p class="text-muted mb-2">@{{ profile_user.username }}</p>
+                    
+                    {% if profile.bio %}
+                        <p class="card-text mb-3">{{ profile.bio }}</p>
+                    {% endif %}
+                    
+                    <div class="profile-meta">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="stat-box">
+                                    <h5 class="mb-0">{{ profile.total_quizzes_taken }}</h5>
+                                    <small class="text-muted">Quizzes</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-box">
+                                    <h5 class="mb-0">{{ profile.average_score }}%</h5>
+                                    <small class="text-muted">Avg Score</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-box">
+                                    <h5 class="mb-0">#{{ profile.get_rank|default:"--" }}</h5>
+                                    <small class="text-muted">Rank</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-info mt-4">
+                        {% if profile.location %}
+                            <p class="mb-2"><i class="fas fa-map-marker-alt text-muted"></i> {{ profile.location }}</p>
+                        {% endif %}
+                        {% if profile.website %}
+                            <p class="mb-2"><i class="fas fa-link text-muted"></i> <a href="{{ profile.website }}" target="_blank">{{ profile.website }}</a></p>
+                        {% endif %}
+                        <p class="mb-0"><i class="fas fa-calendar-alt text-muted"></i> Joined {{ profile.joined_date|date:"F Y" }}</p>
+                    </div>
+                    
+                    {% if is_own_profile %}
+                        <div class="mt-4">
+                            <a href="{% url 'edit_profile' %}" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-xl-8 col-lg-7 col-md-6">
+            <!-- Achievements -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-trophy text-warning"></i> Achievements
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if user_achievements %}
+                        <div class="row">
+                            {% for user_achievement in user_achievements %}
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="achievement-badge">
+                                        <div class="achievement-icon">
+                                            <i class="fas {{ user_achievement.achievement.icon }} {{ user_achievement.achievement.color }}"></i>
+                                        </div>
+                                        <div class="achievement-info">
+                                            <h6 class="mb-0">{{ user_achievement.achievement.name }}</h6>
+                                            <small class="text-muted">{{ user_achievement.achievement.description }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-trophy fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No achievements yet. Keep taking quizzes to earn badges!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Subject Performance -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar text-info"></i> Subject Performance
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if subject_performance %}
+                        <div class="row">
+                            {% for subject, data in subject_performance.items %}
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="subject-card">
+                                        <div class="subject-header">
+                                            <h6 class="mb-0">{{ subject }}</h6>
+                                            <span class="badge badge-primary">{{ data.total }} quiz{{ data.total|pluralize }}</span>
+                                        </div>
+                                        <div class="subject-score">
+                                            <div class="score-circle">
+                                                <span class="score-value">{{ data.average|floatformat:1 }}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No quiz data available yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock text-success"></i> Recent Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_submissions %}
+                        <div class="activity-timeline">
+                            {% for submission in recent_submissions %}
+                                <div class="timeline-item">
+                                    <div class="timeline-icon">
+                                        <i class="fas fa-quiz"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h6 class="mb-1">{{ submission.quiz.title }}</h6>
+                                        <div class="timeline-meta">
+                                            <span class="score-badge score-{{ submission.score|floatformat:0 }}">{{ submission.score }}%</span>
+                                            <span class="text-muted">{{ submission.submitted_at|timesince }} ago</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No recent activity.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-card {
+    border: none;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border-radius: 15px;
+}
+
+.profile-avatar {
+    position: relative;
+}
+
+.avatar-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.avatar-initials {
+    font-size: 48px;
+    font-weight: bold;
+    color: white;
+}
+
+.stat-box {
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.02);
+}
+
+.stat-box h5 {
+    color: #667eea;
+    font-weight: bold;
+}
+
+.achievement-badge {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.02);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.achievement-icon {
+    font-size: 24px;
+    margin-right: 15px;
+}
+
+.achievement-info h6 {
+    font-weight: bold;
+}
+
+.subject-card {
+    padding: 20px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.02);
+    border: 1px solid rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.subject-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.score-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.score-value {
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.activity-timeline {
+    position: relative;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.timeline-item:last-child {
+    border-bottom: none;
+}
+
+.timeline-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: white;
+    font-size: 14px;
+}
+
+.timeline-content {
+    flex: 1;
+}
+
+.timeline-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.score-badge {
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.score-90, .score-100 {
+    background: #d4edda;
+    color: #155724;
+}
+
+.score-80, .score-89 {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.score-70, .score-79 {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.score-60, .score-69 {
+    background: #f8d7da;
+    color: #721c24;
+}
+</style>
+{% endblock %}
